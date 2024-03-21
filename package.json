@@ -38,7 +38,7 @@
     "typescript": "^5.2.2",
     "typescript-transform-paths": "^3.4.6",
     "winston": "^3.11.0",
-    "@Emmanuel-MacAnThony/jobber-shared": "^0.3.9"
+    "@Emmanuel-MacAnThony/jobber-shared": "^0.4.1"
   },
   "devDependencies": {
     "@jest/types": "^29.6.3",
