@@ -14,11 +14,15 @@ import { config } from '@gateway/config';
 import { elasticSearch } from '@gateway/elasticsearch';
 import { appRoutes } from '@gateway/routes';
 import { axiosAuthInstance } from '@gateway/services/api/auth.service';
+import { axiosBuyerInstance } from '@gateway/services/api/buyer.service';
+import { axiosSellerInstance } from '@gateway/services/api/seller.service';
+import { axiosGigInstance } from '@gateway/services/api/gig.service';
 import { isAxiosError } from 'axios';
 import { Server } from 'socket.io';
 import { createAdapter } from '@socket.io/redis-adapter';
 import { createClient } from 'redis';
 import { SocketIOAppHandler } from '@gateway/sockets/socket';
+import { axiosMessageInstance } from '@gateway/services/api/message.service';
 
 const DEFAULT_ERROR_CODE = 500;
 const SERVER_PORT = 4000;
@@ -68,6 +72,10 @@ export class GatewayServer {
     app.use((req: Request, _res: Response, next: NextFunction) => {
       if (req.session?.jwt) {
         axiosAuthInstance.defaults.headers['Authorization'] = `Bearer ${req.session?.jwt}`;
+        axiosBuyerInstance.defaults.headers['Authorization'] = `Bearer ${req.session?.jwt}`;
+        axiosSellerInstance.defaults.headers['Authorization'] = `Bearer ${req.session?.jwt}`;
+        axiosGigInstance.defaults.headers['Authorization'] = `Bearer ${req.session?.jwt}`;
+        axiosMessageInstance.defaults.headers['Authorization'] = `Bearer ${req.session}`;
       }
       next();
     });
