@@ -1,9 +1,9 @@
 import http from 'http';
-import 'express-async-errors';
 
-import { winstonLogger, CustomError, IErrorResponse } from '@Emmanuel-MacAnThony/jobber-shared';
+import 'express-async-errors';
+import { CustomError, IErrorResponse, winstonLogger } from '@Emmanuel-MacAnThony/jobber-shared';
+import { Application, Request, Response, json, urlencoded, NextFunction } from 'express';
 import { Logger } from 'winston';
-import { Application, json, urlencoded, Request, Response, NextFunction } from 'express';
 import cookieSession from 'cookie-session';
 import cors from 'cors';
 import hpp from 'hpp';
@@ -17,18 +17,19 @@ import { axiosAuthInstance } from '@gateway/services/api/auth.service';
 import { axiosBuyerInstance } from '@gateway/services/api/buyer.service';
 import { axiosSellerInstance } from '@gateway/services/api/seller.service';
 import { axiosGigInstance } from '@gateway/services/api/gig.service';
-import { isAxiosError } from 'axios';
 import { Server } from 'socket.io';
-import { createAdapter } from '@socket.io/redis-adapter';
 import { createClient } from 'redis';
+import { createAdapter } from '@socket.io/redis-adapter';
 import { SocketIOAppHandler } from '@gateway/sockets/socket';
 import { axiosMessageInstance } from '@gateway/services/api/message.service';
 import { axiosOrderInstance } from '@gateway/services/api/order.service';
+import { axiosReviewInstance } from '@gateway/services/api/review.service';
+import { isAxiosError } from 'axios';
 
-const DEFAULT_ERROR_CODE = 500;
 const SERVER_PORT = 4000;
-export let socketIO: Server;
+const DEFAULT_ERROR_CODE = 500;
 const log: Logger = winstonLogger(`${config.ELASTIC_SEARCH_URL}`, 'apiGatewayServer', 'debug');
+export let socketIO: Server;
 
 export class GatewayServer {
   private app: Application;
@@ -57,7 +58,6 @@ export class GatewayServer {
         ...(config.NODE_ENV !== 'development' && {
           sameSite: 'none'
         })
-        //sameSite: 'none'
       })
     );
     app.use(hpp());
@@ -76,8 +76,9 @@ export class GatewayServer {
         axiosBuyerInstance.defaults.headers['Authorization'] = `Bearer ${req.session?.jwt}`;
         axiosSellerInstance.defaults.headers['Authorization'] = `Bearer ${req.session?.jwt}`;
         axiosGigInstance.defaults.headers['Authorization'] = `Bearer ${req.session?.jwt}`;
-        axiosMessageInstance.defaults.headers['Authorization'] = `Bearer ${req.session}`;
+        axiosMessageInstance.defaults.headers['Authorization'] = `Bearer ${req.session?.jwt}`;
         axiosOrderInstance.defaults.headers['Authorization'] = `Bearer ${req.session?.jwt}`;
+        axiosReviewInstance.defaults.headers['Authorization'] = `Bearer ${req.session?.jwt}`;
       }
       next();
     });
